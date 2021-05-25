@@ -1,23 +1,5 @@
 FROM node:14-alpine
 
-RUN \
-    set -o pipefail \
-    \
-    && apk add --no-cache --virtual .build-dependencies \
-    \
-    && apk add --no-cache \
-        libcrypto1.1 \
-        libssl1.1 \
-        musl-utils \
-        musl \
-        make \
-        g++ \
-        sqlite \
-    && apk add libimagequant-dev --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main \
-    && apk add vips-dev --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community \
-    \
-    && rm -f -r \
-        /tmp/*
 RUN apk add --no-cache --virtual .build-dependencies \
 	&& apk --no-cache add libpng librsvg libgsf giflib libjpeg-turbo musl make g++ musl-utils libssl1.1 libcrypto1.1 \
 	&& apk add libimagequant-dev fftw-dev build-base --update-cache  --repository https://alpine.global.ssl.fastly.net/alpine/edge/testing/  --repository https://alpine.global.ssl.fastly.net/alpine/edge/main \
@@ -49,17 +31,14 @@ RUN apk add --no-cache --virtual .build-dependencies \
 
 WORKDIR /app
 
-COPY package*.json ./
 RUN chown -R node:node /app
 
 USER node
 
 COPY --chown=node:node package*.json ./
 
-RUN npm install --unsafe-perm
 RUN npm install
 
-COPY . .
 COPY --chown=node:node . ./
 
-CMD ["npm", "run", "start"] 
+CMD ["npm", "run", "start"]
